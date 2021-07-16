@@ -1,0 +1,21 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t jan.psota/react-test -f ./client/Dockerfile.dev /.
+
+
+after_success:
+  - docker build -jan.psota/multi-client  ./client
+  - docker build -jan.psota/multi-nginx  ./nginx
+  - docker build -jan.psota/multi-server ./server
+  - docker build -jan.psota/multi-worker ./worker
+
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push jan.psota/multi-client
+  - docker push jan.psota/multi-nginx 
+  - docker push jan.psota/multi-server
+  - docker push jan.psota/multi-worker
